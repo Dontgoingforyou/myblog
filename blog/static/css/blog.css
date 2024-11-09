@@ -1,97 +1,244 @@
+/* Общие стили для body */
 body {
-    margin:0;
-    padding:0;
-    font-family:helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f9;
+    color: #333;
+    line-height: 1.6;
 }
 
+/* Ссылки */
 a {
-    color:#00abff;
-    text-decoration:none;
+    color: #00abff;
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 
+a:hover {
+    color: #007bb5;
+}
+
+/* Заголовки */
+h1, h2 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Заголовок главного контента */
 h1 {
-    font-weight:normal;
-    border-bottom:1px solid #bbb;
-    padding:0 0 10px 0;
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 10px;
 }
 
-h2 {
-    font-weight:normal;
-    margin:30px 0 0;
+/* Основной контейнер с контентом и сайдбаром */
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 30px;
+    padding-top: 20px;
 }
 
+/* Основной контент */
 #content {
-    float:left;
-    width:60%;
-    padding:0 0 0 30px;
+    flex: 0 0 65%;
+    padding-right: 30px;
 }
 
+/* Сайдбар */
 #sidebar {
-    float:right;
-    width:30%;
-    padding:10px;
-    background:#efefef;
-    height:100%;
+    flex: 0 0 30%;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
-p.date {
-    color:#ccc;
-    font-family: georgia, serif;
+/* Параграфы */
+p {
     font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Параграф с датой */
+p.date {
+    color: #888;
+    font-family: 'Georgia', serif;
     font-style: italic;
 }
 
-.left {
-    float:left;
-    margin-right:10px;
+/* Лента подписки */
+#sidebar a {
+    font-weight: bold;
+    color: #2c3e50;
+    display: inline-block;
+    margin-top: 10px;
+    text-transform: uppercase;
 }
 
-/* pagination */
+#sidebar a:hover {
+    color: #00abff;
+}
+
+/* Стиль для списков последних и популярных постов */
+ul {
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+ul li a {
+    font-size: 16px;
+    color: #34495e;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+ul li a:hover {
+    color: #00abff;
+}
+
+/* Пагинация */
 .pagination {
-    margin:40px 0;
-    font-weight:bold;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 40px 0;
 }
 
-/* forms */
+.pagination a {
+    background-color: #00abff;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #007bb5;
+}
+
+/* Формы */
 label {
-    float:left;
-    clear:both;
-    color:#333;
-    margin-bottom:4px;
-}
-input, textarea {
-    clear:both;
-    float:left;
-    margin:0 0 10px;
-    background:#ededed;
-    border:0;
-    padding:6px 10px;
-    font-size:12px;
-}
-input[type=submit] {
-    font-weight:bold;
-    background:#00abff;
-    color:#fff;
-    padding:10px 20px;
-    font-size:14px;
-    text-transform:uppercase;
-}
-.errorlist {
-    color:#cc0033;
-    float:left;
-    clear:both;
-    padding-left:10px;
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
 }
 
-/* comments */
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+input[type="submit"] {
+    background-color: #00abff;
+    color: white;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+    background-color: #007bb5;
+}
+
+/* Ошибки в формах */
+.errorlist {
+    color: #cc0033;
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+/* Комментарии */
 .comment {
-    padding:10px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
+
 .comment:nth-child(even) {
-    background:#efefef;
+    background-color: #f9f9f9;
 }
+
 .comment .info {
-    font-weight:bold;
-    font-size:12px;
-    color:#666;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+}
+
+/* Стиль для блока с изображением */
+.comment .left {
+    float: left;
+    margin-right: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Дополнительные визуальные эффекты */
+.card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.card h3 {
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.card p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.card a {
+    color: #00abff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.card a:hover {
+    color: #007bb5;
+}
+
+/* Анимации */
+.fadeIn {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
