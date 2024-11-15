@@ -1,4 +1,4 @@
-from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import render, get_object_or_404
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from django.db.models import Count
 from taggit.models import Tag
-from django.db.models import Func, F, Q
+from django.db.models import Q
 
 from blog.forms import EmailPostForm, CommentForm, SearchForm
 from blog.models import Post
@@ -105,21 +105,6 @@ def post_search(request):
     form = SearchForm()
     query = None
     results = []
-
-    # if 'query' in request.GET:
-    #     form = SearchForm(request.GET)
-    #     if form.is_valid():
-    #         query = form.cleaned_data['query']
-    #         results = (
-    #             Post.published.annotate(
-    #                 title_similarity=TrigramSimilarity(Func(F('title'), function='unaccent'), query),
-    #                 body_similarity=TrigramSimilarity(Func(F('body'), function='unaccent'), query),
-    #             )
-    #             .filter(
-    #                 Q(title_similarity__gt=0.1) | Q(body_similarity__gt=0.1)
-    #             )
-    #             .order_by('-title_similarity', '-body_similarity')
-    #         )
 
     if 'query' in request.GET:
         form = SearchForm(request.GET)
