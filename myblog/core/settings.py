@@ -97,8 +97,22 @@ USE_TZ = env_bool('USE_TZ', default=True)
 
 STATIC_URL = os.getenv('STATIC_URL', 'static/')
 
+email_port = int(os.getenv('EMAIL_PORT', '587'))
+email_use_ssl = env_bool('EMAIL_USE_SSL', default=email_port == 465)
+email_use_tls = env_bool('EMAIL_USE_TLS', default=False) and not email_use_ssl
+
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
+
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'OPTIONS': {
+            'host': os.getenv('EMAIL_HOST', ''),
+            'port': email_port,
+            'username': os.getenv('EMAIL_HOST_USER', ''),
+            'password': os.getenv('EMAIL_HOST_PASSWORD', ''),
+            'use_tls': email_use_tls,
+            'use_ssl': email_use_ssl,
+        },
     },
 }

@@ -64,3 +64,114 @@ p.date {
 #sidebar p {
     margin-bottom: 0;
 }
+
+.comment {
+    margin: 0 0 1rem;
+    padding: 0.9rem 1rem;
+    background: #fff;
+    border: 1px solid #e4e4e0;
+    border-radius: 8px;
+}
+
+.comment .info {
+    margin: 0 0 0.5rem;
+    color: #666;
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+}
+
+.comment p:last-child {
+    margin-bottom: 0;
+}
+
+.comments-empty {
+    color: #666;
+    font-family: system-ui, sans-serif;
+}
+
+.share-form p,
+.share-success,
+.comment-form p {
+    font-family: system-ui, sans-serif;
+}
+
+.share-form p,
+.comment-form p {
+    margin: 0 0 1rem;
+}
+
+.comment-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-form-row > div {
+    flex: 1 1 12rem;
+    min-width: 0;
+}
+
+.share-form label,
+.comment-form label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.share-form input[type="text"],
+.share-form input[type="email"],
+.comment-form input[type="text"],
+.comment-form input[type="email"],
+.share-form textarea,
+.comment-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #d5d5d0;
+    border-radius: 6px;
+    background: #fff;
+    font: inherit;
+    color: inherit;
+}
+
+.share-form textarea,
+.comment-form textarea {
+    min-height: 8rem;
+    resize: vertical;
+}
+
+.share-form input:focus,
+.share-form textarea:focus,
+.comment-form input:focus,
+.comment-form textarea:focus {
+    outline: 2px solid #c5d7fb;
+    border-color: #0b57d0;
+}
+
+.share-form input[type="submit"],
+.comment-form input[type="submit"] {
+    margin-top: 0.25rem;
+    padding: 0.55rem 1.1rem;
+    border: 0;
+    border-radius: 6px;
+    background: #0b57d0;
+    color: #fff;
+    font-family: system-ui, sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.share-form input[type="submit"]:hover,
+.comment-form input[type="submit"]:hover {
+    background: #0842a0;
+}
+
+.share-form .errorlist,
+.comment-form .errorlist {
+    margin: 0 0 0.35rem;
+    padding: 0;
+    list-style: none;
+    color: #b42318;
+    font-size: 0.85rem;
+}
