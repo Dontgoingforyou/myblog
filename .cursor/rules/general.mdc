@@ -15,4 +15,4 @@ alwaysApply: true
 - Сервер, Docker и базу не менять без явной просьбы. Диагностика на чтение — можно.
 - Коммит и push — только по явной просьбе в текущем сообщении.
 
-Стиль: **clean-code.mdc**. Проверка: **testing.mdc**, **docker.mdc**. Git: **git-workflow.mdc**.
+Стиль: **clean-code.mdc**. Проверка: **testing.mdc**, **docker.mdc**. Git: **git-workflow.mdc**. Безопасность: **security.mdc**. Логи: **logging.mdc**.

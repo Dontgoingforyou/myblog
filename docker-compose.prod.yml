@@ -1,0 +1,38 @@
+# Схема для хоста за прокси, который завершает HTTPS и передаёт
+# X-Forwarded-Proto. Локальный стенд — docker-compose.yml.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - myblog_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      DEBUG: "False"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - myblog_media:/app/myblog/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  myblog_pgdata:
+  myblog_media:

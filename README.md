@@ -34,4 +34,14 @@ cd myblog && ../my_env/bin/python manage.py runserver
 
 Порт базы берётся из `POSTGRES_PORT`. `make test` создаёт отдельную базу на этом же сервере, пользователю нужно право создавать базы. `make lint` запускает flake8.
 
-На push и pull request GitHub Actions гоняет flake8 и pytest.
+На push и pull request Actions отдельно запускает flake8 и pytest.
+
+## За прокси
+
+`make up` оставляет `DEBUG=True`. Для машины за прокси, который завершает HTTPS и передаёт `X-Forwarded-Proto`:
+
+```sh
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+В этом файле `DEBUG=False`: куки только по HTTPS, редирект на HTTPS, HSTS на час, порт базы наружу не открывается. В `.env` нужны свой `SECRET_KEY` и `ALLOWED_HOSTS`. Статику, медиа и TLS отдаёт прокси. `runserver` в контейнере остаётся сервером разработки.

@@ -1,0 +1,13 @@
+---
+description: Секреты, отладка и публичные формы
+globs: "**/*.py,**/docker-compose*.yml,**/.env*"
+alwaysApply: false
+---
+
+# Безопасность
+
+Секреты только в `.env`. В лог не попадают пароль, `SECRET_KEY`, адрес почты, текст комментария и текст письма.
+
+`DEBUG=False` включает HTTPS-настройки из `core.https.https_settings`: secure-cookie, редирект на HTTPS, HSTS на час, nosniff и доверие к `X-Forwarded-Proto`. Локальный `docker-compose.yml` может оставить `DEBUG=True`. `docker-compose.prod.yml` ставит `DEBUG=False` и не публикует порт базы.
+
+Комментарий гостя Django экранирует. Markdown поста — текст автора. Повтор той же отправки комментария отсекает одноразовый ключ формы.
