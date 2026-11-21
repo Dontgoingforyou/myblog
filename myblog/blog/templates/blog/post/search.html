@@ -1,0 +1,30 @@
+{% extends "blog/base.html" %}
+{% load blog_extras %}
+
+{% block title %}Поиск{% endblock %}
+
+{% block content %}
+    <h1>Поиск</h1>
+    <form method="get" class="search-form">
+        {{ form.as_p }}
+        <input type="submit" value="Поиск">
+    </form>
+    {% if query %}
+        <h2>Посты, содержащие «{{ query }}»</h2>
+        {% with results.count as total_results %}
+            <p class="search-count">
+                Найдено {{ total_results }} {{ total_results|russian_pluralize:"результат,результата,результатов" }}
+            </p>
+        {% endwith %}
+        {% for post in results %}
+            <article class="search-result">
+                <h3>
+                    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </h3>
+                {{ post.body|markdown|truncatewords_html:15 }}
+            </article>
+        {% empty %}
+            <p class="search-empty">Ничего не найдено.</p>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

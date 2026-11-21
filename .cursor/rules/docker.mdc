@@ -1,0 +1,14 @@
+---
+description: Локальный запуск сайта и базы
+globs: "**/Dockerfile,**/docker-compose*.yml,**/.env*,**/docker/**"
+alwaysApply: false
+---
+
+# Docker
+
+Локальный стенд — `docker-compose.yml` в корне: Django и PostgreSQL. Образ сайта не содержит секретов и `.env`. Переменные приходят снаружи.
+
+- Данные базы — named volume `myblog_pgdata`, не каталог репозитория.
+- Внутри сети compose база — хост `db`, порт `5432`. Порт на хосте берётся из `POSTGRES_PORT`.
+- После старта сайт слушает http://127.0.0.1:8000. Миграции выполняет entrypoint.
+- `make up` и `make down` — те же команды, что описаны в Makefile.
