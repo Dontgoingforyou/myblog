@@ -14,7 +14,9 @@ make up
 Сайт: http://127.0.0.1:8000/blog/  
 Админка: http://127.0.0.1:8000/admin/
 
-`make up` поднимает базу и сайт и применяет миграции. Остановка — `make down`, данные базы остаются.
+`make up` поднимает базу и сайт, применяет миграции и, если постов ещё нет, добавляет несколько примеров. Повторный запуск их не дублирует. Остановка — `make down`, данные базы остаются.
+
+На push и pull request GitHub Actions гоняет flake8 и pytest.
 
 ```sh
 docker compose exec web python myblog/manage.py createsuperuser
@@ -30,6 +32,7 @@ docker compose exec web python myblog/manage.py createsuperuser
 docker compose up -d db
 make install
 cd myblog && ../my_env/bin/python manage.py migrate
+make seed
 cd myblog && ../my_env/bin/python manage.py runserver
 ```
 

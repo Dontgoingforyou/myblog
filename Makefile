@@ -9,7 +9,7 @@ PY=$(VENV)/bin/python
 PIP=$(VENV)/bin/pip
 COMPOSE=docker compose
 
-.PHONY: help install lint test up down logs migrate
+.PHONY: help install lint test up down logs migrate seed
 
 help:
 	@echo "Команды:"
@@ -20,6 +20,7 @@ help:
 	@echo "  make down      — остановить контейнеры, volume базы сохранить"
 	@echo "  make logs      — логи стенда"
 	@echo "  make migrate   — миграции в уже запущенном контейнере сайта"
+	@echo "  make seed      — примеры постов, если блог ещё пустой"
 
 install:
 	python3 -m venv $(VENV)
@@ -42,3 +43,6 @@ logs:
 
 migrate:
 	$(COMPOSE) exec web python myblog/manage.py migrate --noinput
+
+seed:
+	cd myblog && ../$(PY) manage.py seed
