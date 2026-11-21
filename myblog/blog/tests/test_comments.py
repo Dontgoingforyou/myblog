@@ -170,6 +170,34 @@ def test_reply_to_inactive_comment_stays_hidden(client, published_post):
 
 
 @pytest.mark.django_db
+def test_comments_are_paginated(client, published_post):
+    first = None
+    for index in range(11):
+        comment = Comment.objects.create(
+            post=published_post,
+            name='Анна',
+            email='anna@example.com',
+            body=f'Корень {index:02d}',
+        )
+        if first is None:
+            first = comment
+    Comment.objects.create(
+        post=published_post,
+        parent=first,
+        name='Борис',
+        email='boris@example.com',
+        body='Ответ на первый',
+    )
+
+    page = client.get(published_post.get_absolute_url(), {'page': 2})
+
+    assert page.context['comments_count'] == 12
+    assert [comment.body for comment in page.context['comments']] == ['Корень 10']
+    assert 'Ответ на первый' not in page.content.decode()
+    assert 'page=1' in page.content.decode()
+
+
+@pytest.mark.django_db
 def test_comment_get_is_not_allowed(client, published_post):
     response = client.get(reverse('blog:post_comment', args=[published_post.id]))
 

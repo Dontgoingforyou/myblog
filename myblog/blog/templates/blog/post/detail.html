@@ -71,6 +71,7 @@
             {% empty %}
             <p class="comments-empty">Пока нет комментариев.</p>
         {% endfor %}
+        {% include "paginator.html" with page=comment_page %}
         {% include "blog/post/includes/comment_form.html" %}
     </section>
 {% endblock %}

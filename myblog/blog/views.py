@@ -4,8 +4,9 @@ import threading
 
 from django.contrib import messages
 from django.contrib.postgres.search import TrigramWordSimilarity
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db.models.functions import Greatest, Lower
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -17,6 +18,9 @@ from .models import Comment, Post
 from .forms import EmailPostForm, CommentForm, SearchForm
 
 logger = logging.getLogger(__name__)
+
+SEARCH_PAGE_SIZE = 10
+COMMENT_PAGE_SIZE = 10
 
 
 class PostListView(ListView):
@@ -57,11 +61,11 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.object
-        comments = list(post.comments.filter(active=True).select_related('parent'))
-        threads = comment_threads(comments)
+        threads, comment_page = _comment_page(post, self.request.GET.get('page'))
         author = _comment_author(self.request)
         context['comments'] = threads
-        context['comments_count'] = sum(1 + len(item.thread_replies) for item in threads)
+        context['comment_page'] = comment_page
+        context['comments_count'] = _visible_comment_count(post)
         context['comment_name'] = author['name']
         context['comment_email'] = author['email']
         context['comment_token'] = _comment_token(self.request)
@@ -120,6 +124,42 @@ def comment_threads(comments):
         else:
             root.thread_replies.append(comment)
     return roots
+
+
+def _comment_page(post, page_number):
+    """Страница корневых комментариев и ответы только к этим корням."""
+    roots = post.comments.filter(active=True, parent__isnull=True).order_by('created_at')
+    page = Paginator(roots, COMMENT_PAGE_SIZE).get_page(page_number)
+    root_ids = [comment.id for comment in page.object_list]
+    loaded_roots = list(
+        Comment.objects.filter(id__in=root_ids).select_related('parent').order_by('created_at')
+    )
+    threads = comment_threads(loaded_roots + _thread_replies(post, root_ids))
+    return threads, page
+
+
+def _thread_replies(post, root_ids):
+    replies = []
+    frontier = list(root_ids)
+    seen = set(root_ids)
+    while frontier:
+        children = list(
+            post.comments.filter(active=True, parent_id__in=frontier).select_related('parent')
+        )
+        frontier = []
+        for child in children:
+            if child.id in seen:
+                continue
+            seen.add(child.id)
+            replies.append(child)
+            frontier.append(child.id)
+    return replies
+
+
+def _visible_comment_count(post):
+    return post.comments.filter(active=True).filter(
+        Q(parent__isnull=True) | Q(parent__active=True),
+    ).count()
 
 
 def deliver_share_mail(subject, message, sender, recipient):
@@ -208,14 +248,15 @@ def post_search(request):
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data['query']
-            results = Post.published.annotate(
+            found = Post.published.annotate(
                 similarity=Greatest(
                     TrigramWordSimilarity(query, Lower('title')),
                     TrigramWordSimilarity(query, Lower('body')),
                 ),
             ).filter(similarity__gt=0.4).order_by('-similarity')
+            results = Paginator(found, SEARCH_PAGE_SIZE).get_page(request.GET.get('page'))
         else:
-            results = []
+            results = Paginator(Post.published.none(), SEARCH_PAGE_SIZE).get_page(1)
     return render(
         request,
         'blog/post/search.html',
