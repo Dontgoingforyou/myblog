@@ -29,9 +29,9 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'post', 'created_at', 'active']
+    list_display = ['name', 'email', 'post', 'parent', 'created_at', 'active']
     list_filter = ['active', 'created_at', 'updated_at']
     search_fields = ['name', 'email', 'body']
     ordering = ['created_at']
-    raw_id_fields = ['post']
+    raw_id_fields = ['post', 'parent']
     show_facets = admin.ShowFacets.ALWAYS

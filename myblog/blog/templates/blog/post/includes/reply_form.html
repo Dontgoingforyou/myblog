@@ -1,0 +1,21 @@
+<details class="reply-box">
+    <summary>Ответить {{ reply_to.name }}</summary>
+    <form method="post" action="{% url 'blog:post_comment' post.id %}" class="comment-form reply-form">
+        {% csrf_token %}
+        <input type="hidden" name="token" value="{{ comment_token }}">
+        <input type="hidden" name="parent" value="{{ reply_to.id }}">
+        <div class="comment-form-row">
+            <div>
+                <label for="reply-{{ reply_to.id }}-name">Имя</label>
+                <input id="reply-{{ reply_to.id }}-name" type="text" name="name" maxlength="80" value="{{ comment_name }}" required>
+            </div>
+            <div>
+                <label for="reply-{{ reply_to.id }}-email">Email</label>
+                <input id="reply-{{ reply_to.id }}-email" type="email" name="email" value="{{ comment_email }}" required>
+            </div>
+        </div>
+        <label for="reply-{{ reply_to.id }}-body">Текст</label>
+        <textarea id="reply-{{ reply_to.id }}-body" name="body" required></textarea>
+        <input type="submit" value="Ответить">
+    </form>
+</details>

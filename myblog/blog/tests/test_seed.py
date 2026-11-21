@@ -14,7 +14,8 @@ def test_seed_fills_empty_blog_once():
     author = get_user_model().objects.get(username='author')
     assert author.has_usable_password() is False
     commented = Post.objects.get(slug='kommentarii')
-    assert commented.comments.count() == 1
+    assert commented.comments.filter(parent__isnull=True).count() == 1
+    assert commented.comments.filter(parent__isnull=False).count() == 1
     assert Post.objects.get(slug='poisk-po-slovu').cover
 
     call_command('seed')

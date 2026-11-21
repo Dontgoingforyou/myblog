@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.db import models
+from django.db.models.functions import Lower
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
@@ -40,6 +42,8 @@ class Post(models.Model):
         ordering = ['-publish']
         indexes = [
             models.Index(fields=['-publish']),
+            GinIndex(OpClass(Lower('title'), name='gin_trgm_ops'), name='post_title_trgm'),
+            GinIndex(OpClass(Lower('body'), name='gin_trgm_ops'), name='post_body_trgm'),
         ]
 
     def __str__(self):
@@ -51,12 +55,21 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replies',
+        verbose_name='Ответ на',
+    )
     name = models.CharField('Имя', max_length=80)
     email = models.EmailField('Email')
     body = models.TextField('Текст')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     active = models.BooleanField('Активный', default=True)
+    submit_token = models.CharField(max_length=64, unique=True, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Комментарий'

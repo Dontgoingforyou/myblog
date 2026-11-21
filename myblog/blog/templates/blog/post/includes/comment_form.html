@@ -10,5 +10,9 @@
     </div>
     {{ form.body.as_field_group }}
     {% csrf_token %}
+    <input type="hidden" name="token" value="{{ comment_token }}">
+    {% if parent %}
+        <input type="hidden" name="parent" value="{{ parent.id }}">
+    {% endif %}
     <input type="submit" value="Добавить">
 </form>

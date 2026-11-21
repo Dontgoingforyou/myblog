@@ -43,7 +43,7 @@
     </section>
 
     <section class="comments">
-        {% with comments.count as total_comments %}
+        {% with comments_count as total_comments %}
             <h2>
                 {{ total_comments }} комментари{{ total_comments|russian_pluralize:"й,я,ев" }}
             </h2>
@@ -54,6 +54,19 @@
                     {{ comment.name }} · {{ comment.created_at|date:"j E Y, H:i" }}
                 </p>
                 {{ comment.body|linebreaks }}
+                {% include "blog/post/includes/reply_form.html" with reply_to=comment %}
+                {% for reply in comment.thread_replies %}
+                    <div class="comment comment-reply" id="comment-{{ reply.id }}">
+                        <p class="info">
+                            {{ reply.name }} · {{ reply.created_at|date:"j E Y, H:i" }}
+                        </p>
+                        {% if reply.parent_id != comment.id %}
+                            <p class="reply-to">В ответ {{ reply.parent.name }}</p>
+                        {% endif %}
+                        {{ reply.body|linebreaks }}
+                        {% include "blog/post/includes/reply_form.html" with reply_to=reply %}
+                    </div>
+                {% endfor %}
             </div>
             {% empty %}
             <p class="comments-empty">Пока нет комментариев.</p>

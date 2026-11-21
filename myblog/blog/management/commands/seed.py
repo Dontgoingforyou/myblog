@@ -50,6 +50,13 @@ POSTS = [
                 'name': 'Анна',
                 'email': 'anna@example.com',
                 'body': 'Проверочный комментарий.',
+                'replies': [
+                    {
+                        'name': 'Борис',
+                        'email': 'boris@example.com',
+                        'body': 'Ответ на проверочный комментарий.',
+                    },
+                ],
             },
         ],
     },
@@ -106,15 +113,18 @@ class Command(BaseCommand):
             return post, True
         return post, False
 
-    def _comment(self, post, data):
-        if post.comments.filter(name=data['name'], body=data['body']).exists():
-            return
-        Comment.objects.create(
-            post=post,
-            name=data['name'],
-            email=data['email'],
-            body=data['body'],
-        )
+    def _comment(self, post, data, parent=None):
+        comment = post.comments.filter(name=data['name'], body=data['body'], parent=parent).first()
+        if comment is None:
+            comment = Comment.objects.create(
+                post=post,
+                parent=parent,
+                name=data['name'],
+                email=data['email'],
+                body=data['body'],
+            )
+        for reply in data.get('replies', []):
+            self._comment(post, reply, parent=comment)
 
     def _cover(self):
         buffer = BytesIO()
