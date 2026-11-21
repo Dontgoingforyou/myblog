@@ -49,7 +49,9 @@ a:hover {
     text-decoration: underline;
 }
 
-p.date {
+p.date,
+p.tags,
+p.tag-filter {
     margin-top: 0;
     color: #666;
     font-family: system-ui, sans-serif;
