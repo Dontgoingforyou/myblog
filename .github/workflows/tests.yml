@@ -33,6 +33,7 @@ jobs:
           --health-retries 10
     env:
       SECRET_KEY: ci-secret
+      DEBUG: "True"
       POSTGRES_DB: myblog
       POSTGRES_USER: myblog
       POSTGRES_PASSWORD: myblog
