@@ -21,7 +21,11 @@
                 <h3>
                     <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
                 </h3>
-                {{ post.body|markdown|truncatewords_html:15 }}
+                {% if post.summary %}
+                    <p>{{ post.summary }}</p>
+                {% else %}
+                    {{ post.body|markdown|truncatewords_html:15 }}
+                {% endif %}
             </article>
         {% empty %}
             <p class="search-empty">Ничего не найдено.</p>

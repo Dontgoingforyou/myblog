@@ -30,9 +30,12 @@ services:
       ALLOWED_HOSTS: 127.0.0.1,localhost
     ports:
       - "127.0.0.1:8000:8000"
+    volumes:
+      - myblog_media:/app/myblog/media
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   myblog_pgdata:
+  myblog_media:

@@ -2,40 +2,62 @@
 {% load blog_extras %}
 
 {% block title %}{{ post.title }}{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block meta_description %}
+<meta name="description" content="{{ post.summary|default:post.body|truncatewords:30 }}">
+<meta property="og:description" content="{{ post.summary|default:post.body|truncatewords:30 }}">
+{% endblock %}
+{% block og_image %}
+    {% if post.cover %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.cover.url }}">
+    {% endif %}
+{% endblock %}
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
-    <p class="date">
-        Опубликовано {{ post.publish }} {{ post.author }}
-    </p>
-    {{ post.body|markdown }}
-    <p>
-        <a href="{% url 'blog:post_share' post.id %}">Поделиться этим постом</a>
-    </p>
-
-    <h2>Похожие посты</h2>
-    {% for post in similar_posts %}
-        <p>
-            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+    <article class="post">
+        <h1>{{ post.title }}</h1>
+        <p class="date">
+            {{ post.publish|date:"j E Y" }} · {{ post.author }}
         </p>
-    {% empty %}
-        <p>Похожие посты не найдены.</p>
-    {% endfor %}
-
-    {% with comments.count as total_comments %}
-        <h2>
-            {{ total_comments }} комментари{{ total_comments|russian_pluralize:"й,я,ев" }}
-        </h2>
-    {% endwith %}
-    {% for comment in comments %}
-        <div class="comment">
-            <p class="info">
-                Комментарий {{ forloop.counter }} добавлен {{ comment.created_at }}
-            </p>
-            {{ comment.body|linebreaks }}
+        {% if post.cover %}
+            <img class="post-hero" src="{{ post.cover.url }}" alt="{{ post.title }}">
+        {% endif %}
+        <div class="post-body">
+            {{ post.body|markdown }}
         </div>
-        {% empty %}
-        <p class="comments-empty">Пока нет комментариев.</p>
-    {% endfor %}
-    {% include "blog/post/includes/comment_form.html" %}
+        <p class="share-link">
+            <a href="{% url 'blog:post_share' post.id %}">Поделиться этим постом</a>
+        </p>
+    </article>
+
+    <section class="related">
+        <h2>Похожие посты</h2>
+        <ul>
+            {% for post in similar_posts %}
+                <li><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></li>
+            {% empty %}
+                <li class="empty">Похожие посты не найдены.</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="comments">
+        {% with comments.count as total_comments %}
+            <h2>
+                {{ total_comments }} комментари{{ total_comments|russian_pluralize:"й,я,ев" }}
+            </h2>
+        {% endwith %}
+        {% for comment in comments %}
+            <div class="comment" id="comment-{{ comment.id }}">
+                <p class="info">
+                    {{ comment.name }} · {{ comment.created_at|date:"j E Y, H:i" }}
+                </p>
+                {{ comment.body|linebreaks }}
+            </div>
+            {% empty %}
+            <p class="comments-empty">Пока нет комментариев.</p>
+        {% endfor %}
+        {% include "blog/post/includes/comment_form.html" %}
+    </section>
 {% endblock %}

@@ -3,36 +3,46 @@
 {% block title %}Мой блог{% endblock %}
 
 {% block content %}
-    <h1>Мой блог</h1>
-
     {% if tag %}
-        <h2>Посты с тегом «{{ tag.name }}»</h2>
+        <h1>Тег «{{ tag.name }}»</h1>
         <p class="tag-filter">
             <a href="{% url 'blog:post_list' %}">Показать все посты</a>
         </p>
     {% endif %}
 
     {% for post in posts %}
-        <h2>
-            <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-        </h2>
-        {% with post.tags.all as post_tags %}
-            {% if post_tags %}
-                <p class="tags">
-                    Теги:
-                    {% for post_tag in post_tags %}
-                        <a href="{% url 'blog:post_list_by_tag' post_tag.slug %}">
-                            {{ post_tag.name }}
-                        </a>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
+        <article class="post-card">
+            {% if post.cover %}
+                <a href="{{ post.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+                    <img class="post-cover" src="{{ post.cover.url }}" alt="">
+                </a>
             {% endif %}
-        {% endwith %}
-        <p class="date">
-            Опубликовано {{ post.publish }} {{ post.author }}
-        </p>
-        {{ post.body|markdown|truncatewords_html:30 }}
+            <h2>
+                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            </h2>
+            {% with post.tags.all as post_tags %}
+                {% if post_tags %}
+                    <p class="tags">
+                        {% for post_tag in post_tags %}
+                            <a href="{% url 'blog:post_list_by_tag' post_tag.slug %}">{{ post_tag.name }}</a>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            {% endwith %}
+            <p class="date">
+                {{ post.publish|date:"j E Y" }} · {{ post.author }}
+            </p>
+            <div class="post-excerpt">
+                {% if post.summary %}
+                    <p>{{ post.summary }}</p>
+                {% else %}
+                    {{ post.body|markdown|truncatewords_html:30 }}
+                {% endif %}
+            </div>
+        </article>
+    {% empty %}
+        <p class="empty">Пока нет постов.</p>
     {% endfor %}
-    
+
     {% include "paginator.html" with page=page_obj %}
 {% endblock %}

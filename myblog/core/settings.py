@@ -107,6 +107,8 @@ USE_I18N = env_bool('USE_I18N', default=True)
 USE_TZ = env_bool('USE_TZ', default=True)
 
 STATIC_URL = os.getenv('STATIC_URL', 'static/')
+MEDIA_URL = os.getenv('MEDIA_URL', 'media/')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 email_port = int(os.getenv('EMAIL_PORT', '587'))
 email_use_ssl = env_bool('EMAIL_USE_SSL', default=email_port == 465)

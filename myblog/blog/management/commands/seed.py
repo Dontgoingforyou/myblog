@@ -1,8 +1,11 @@
 from datetime import datetime
+from io import BytesIO
 
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from PIL import Image
 
 from blog.models import Comment, Post
 
@@ -17,6 +20,8 @@ POSTS = [
         'slug': 'poisk-po-slovu',
         'publish': _at(2026, 11, 2),
         'tags': ['поиск', 'postgresql'],
+        'summary': 'Короткое слово ищется внутри заголовка и текста, а не по всей фразе сразу.',
+        'cover': True,
         'body': (
             'Триграммы по всей фразе почти не находят короткое русское слово внутри длинного заголовка.\n\n'
             'Сравнение идёт с отдельными словами заголовка и текста. Порог — 0.4.\n\n'
@@ -40,11 +45,13 @@ POSTS = [
         'publish': _at(2026, 10, 20),
         'tags': ['комментарии'],
         'body': 'Новый комментарий виден сразу. Снять галку «Активный» в админке — и он пропадёт со страницы.',
-        'comment': {
-            'name': 'Анна',
-            'email': 'anna@example.com',
-            'body': 'Проверочный комментарий.',
-        },
+        'comments': [
+            {
+                'name': 'Анна',
+                'email': 'anna@example.com',
+                'body': 'Проверочный комментарий.',
+            },
+        ],
     },
     {
         'title': 'Пост со второй страницы',
@@ -65,29 +72,54 @@ POSTS = [
 
 
 class Command(BaseCommand):
-    help = 'Добавляет примеры постов, если в блоге ещё ничего нет.'
+    help = 'Добавляет недостающие примеры. Уже написанные посты не трогает.'
 
     def handle(self, *args, **options):
-        if Post.objects.exists():
-            self.stdout.write('Посты уже есть, примеры не добавляю.')
-            return
-
         author = self._author()
+        created = 0
         for item in POSTS:
+            post, was_created = self._post(author, item)
+            created += int(was_created)
+            for comment in item.get('comments', []):
+                self._comment(post, comment)
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Добавлено постов: {created}'))
+            return
+        self.stdout.write('Примеры уже на месте.')
+
+    def _post(self, author, item):
+        post = Post.objects.filter(slug=item['slug'], publish__date=item['publish'].date()).first()
+        if post is None:
             post = Post.objects.create(
                 title=item['title'],
                 slug=item['slug'],
                 author=author,
+                summary=item.get('summary', ''),
                 body=item['body'],
                 publish=item['publish'],
                 status=item.get('status', Post.Status.PUBLISHED),
             )
             if item['tags']:
                 post.tags.add(*item['tags'])
-            comment = item.get('comment')
-            if comment:
-                Comment.objects.create(post=post, **comment)
-        self.stdout.write(self.style.SUCCESS(f'Добавлено постов: {len(POSTS)}'))
+            if item.get('cover'):
+                post.cover.save('sample-cover.png', self._cover(), save=True)
+            return post, True
+        return post, False
+
+    def _comment(self, post, data):
+        if post.comments.filter(name=data['name'], body=data['body']).exists():
+            return
+        Comment.objects.create(
+            post=post,
+            name=data['name'],
+            email=data['email'],
+            body=data['body'],
+        )
+
+    def _cover(self):
+        buffer = BytesIO()
+        Image.new('RGB', (1200, 675), (143, 61, 50)).save(buffer, 'PNG')
+        return ContentFile(buffer.getvalue())
 
     def _author(self):
         user_model = get_user_model()

@@ -20,7 +20,7 @@ help:
 	@echo "  make down      — остановить контейнеры, volume базы сохранить"
 	@echo "  make logs      — логи стенда"
 	@echo "  make migrate   — миграции в уже запущенном контейнере сайта"
-	@echo "  make seed      — примеры постов, если блог ещё пустой"
+	@echo "  make seed      — недостающие примеры, уже написанные посты не меняет"
 
 install:
 	python3 -m venv $(VENV)

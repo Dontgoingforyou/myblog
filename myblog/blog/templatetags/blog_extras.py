@@ -2,7 +2,7 @@ import markdown
 
 from django.utils.safestring import mark_safe
 from django import template
-from django.db.models import Count
+from django.db.models import Count, Q
 from ..models import Post
 
 register = template.Library()
@@ -24,6 +24,14 @@ def russian_pluralize(number, forms):
 
 
 @register.simple_tag
+def page_url(request, number):
+    """Ссылка на страницу с остальными параметрами запроса, не только page."""
+    params = request.GET.copy()
+    params['page'] = number
+    return f'?{params.urlencode()}'
+
+
+@register.simple_tag
 def total_posts():
     return Post.published.count()
 
@@ -36,9 +44,12 @@ def show_latest_posts(count=5):
 
 @register.simple_tag
 def get_most_commented_posts(count=5):
-    return Post.published.annotate(total_comments=Count('comments')).order_by('-total_comments')[:count]
+    return Post.published.annotate(
+        total_comments=Count('comments', filter=Q(comments__active=True)),
+    ).order_by('-total_comments', '-publish')[:count]
 
 
 @register.filter(name='markdown')
 def markdown_format(text):
+    """Текст поста из админки, HTML не экранируется."""
     return mark_safe(markdown.markdown(text))

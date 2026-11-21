@@ -23,7 +23,9 @@ class Post(models.Model):
         related_name='blog_posts',
         verbose_name='Автор'
         )
+    summary = models.CharField('Краткое описание', max_length=300, blank=True)
     body = models.TextField('Текст')
+    cover = models.ImageField('Обложка', upload_to='covers/%Y/%m/%d/', blank=True)
     publish = models.DateTimeField('Дата публикации', default=timezone.now)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
@@ -36,7 +38,9 @@ class Post(models.Model):
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
         ordering = ['-publish']
-        indexes = [models.Index(fields=['-publish'])]
+        indexes = [
+            models.Index(fields=['-publish']),
+        ]
 
     def __str__(self):
         return self.title
@@ -61,3 +65,20 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Комментарий {self.name} на {self.post}'
+
+
+class PostImage(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='Пост',
+    )
+    image = models.ImageField('Изображение', upload_to='posts/%Y/%m/%d/')
+
+    class Meta:
+        verbose_name = 'Изображение'
+        verbose_name_plural = 'Изображения'
+
+    def __str__(self):
+        return self.image.name

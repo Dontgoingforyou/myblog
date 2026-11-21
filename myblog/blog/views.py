@@ -17,7 +17,7 @@ class PostListView(ListView):
     template_name = 'blog/post/list.html'
 
     def get_queryset(self):
-        qs = Post.published.all()
+        qs = Post.published.select_related('author').prefetch_related('tags')
         tag_slug = self.kwargs.get('tag_slug')
         if tag_slug:
             self.tag = get_object_or_404(Tag, slug=tag_slug)
@@ -39,8 +39,7 @@ class PostDetailView(DetailView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(
-            Post,
-            status=Post.Status.PUBLISHED,
+            Post.published.select_related('author'),
             slug=self.kwargs['post'],
             publish__year=self.kwargs['year'],
             publish__month=self.kwargs['month'],

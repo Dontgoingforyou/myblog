@@ -4,6 +4,11 @@ from django.contrib.auth import get_user_model
 from blog.models import Post
 
 
+@pytest.fixture(autouse=True)
+def media_root(settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
+
+
 @pytest.fixture
 def author(db):
     return get_user_model().objects.create_user(username='author', password='pass')

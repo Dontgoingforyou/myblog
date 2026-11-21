@@ -6,4 +6,5 @@ my_env
 **/__pycache__
 **/*.py[cod]
 db.sqlite3
+myblog/media
 .pytest_cache

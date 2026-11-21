@@ -1,6 +1,8 @@
 from datetime import timedelta
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 
@@ -23,6 +25,34 @@ def test_list_shows_only_published_posts(client, author, published_post):
     titles = [post.title for post in response.context['posts']]
     assert published_post.title in titles
     assert draft.title not in titles
+
+
+def _query_count(client):
+    with CaptureQueriesContext(connection) as captured:
+        response = client.get(reverse('blog:post_list'))
+    assert response.status_code == 200
+    return len(captured)
+
+
+@pytest.mark.django_db
+def test_list_queries_do_not_grow_with_posts(client, author):
+    def make(slug):
+        post = Post.objects.create(
+            title=slug,
+            slug=slug,
+            author=author,
+            body='Текст',
+            status=Post.Status.PUBLISHED,
+        )
+        post.tags.add('python', 'django')
+
+    make('one')
+    one_post = _query_count(client)
+    make('two')
+    make('three')
+    three_posts = _query_count(client)
+
+    assert one_post == three_posts
 
 
 @pytest.mark.django_db
@@ -59,6 +89,19 @@ def test_tag_page_filters_posts(client, author, published_post):
     titles = [post.title for post in response.context['posts']]
     assert titles == [published_post.title]
     assert other.title not in titles
+
+
+@pytest.mark.django_db
+def test_cyrillic_tag_page_opens(client, published_post):
+    published_post.tags.add('поиск')
+    tag = published_post.tags.get(name='поиск')
+
+    response = client.get(reverse('blog:post_list'))
+
+    assert response.status_code == 200
+    page = client.get(reverse('blog:post_list_by_tag', args=[tag.slug]))
+    assert page.status_code == 200
+    assert list(page.context['posts']) == [published_post]
 
 
 @pytest.mark.django_db
